@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brahma Vidya Adhyan Course - Production Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1>🕉️ Brahma Vidya Adhyan Course</h1>
+                <h2>Production Performance Dashboard</h2>
+                <p class="date-range" id="dateRange">Loading data...</p>
+            </div>
+        </header>
+
+        <!-- Filters Section -->
+        <section class="filters-section">
+            <div class="filter-container">
+                <div class="filter-group">
+                    <label for="yearFilter">Year:</label>
+                    <select id="yearFilter" onchange="applyFilters()">
+                        <option value="all">All Years</option>
+                        <option value="1">Year 1</option>
+                        <option value="2">Year 2</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="subjectFilter">Subject:</label>
+                    <select id="subjectFilter" onchange="applyFilters()">
+                        <option value="all">All Subjects</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="memberFilter">Team Member:</label>
+                    <select id="memberFilter" onchange="applyFilters()">
+                        <option value="all">All Members</option>
+                    </select>
+                </div>
+                
+                <button class="reset-btn" onclick="resetFilters()">Reset Filters</button>
+            </div>
+        </section>
+
+        <!-- KPI Cards Section -->
+        <section class="kpi-section">
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon">📚</div>
+                    <div class="kpi-content">
+                        <h3 class="kpi-value" id="kpi-total-classes">0</h3>
+                        <p class="kpi-label">Total Classes Produced</p>
+                        <span class="kpi-detail" id="kpi-classes-detail">Across 2 years</span>
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-icon">⏱️</div>
+                    <div class="kpi-content">
+                        <h3 class="kpi-value" id="kpi-avg-duration">0</h3>
+                        <p class="kpi-label">Avg. Completion Time</p>
+                        <span class="kpi-detail" id="kpi-duration-detail">Days per class</span>
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-icon">👥</div>
+                    <div class="kpi-content">
+                        <h3 class="kpi-value" id="kpi-team-size">7</h3>
+                        <p class="kpi-label">Active Team Members</p>
+                        <span class="kpi-detail" id="kpi-team-detail">Core contributors</span>
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-icon">📊</div>
+                    <div class="kpi-content">
+                        <h3 class="kpi-value" id="kpi-production-rate">0</h3>
+                        <p class="kpi-label">Production Rate</p>
+                        <span class="kpi-detail" id="kpi-rate-detail">Classes per month</span>
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-icon">✅</div>
+                    <div class="kpi-content">
+                        <h3 class="kpi-value" id="kpi-on-time">0%</h3>
+                        <p class="kpi-label">On-Time Delivery</p>
+                        <span class="kpi-detail" id="kpi-ontime-detail">Within deadline</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Visualizations Section -->
+        <section class="charts-section">
+            <!-- Row 1: Timeline and Workflow -->
+            <div class="chart-row">
+                <div class="chart-container chart-large">
+                    <h3 class="chart-title">📅 Production Timeline - Classes Over Time</h3>
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Row 2: Team and Subjects -->
+            <div class="chart-row">
+                <div class="chart-container chart-medium">
+                    <h3 class="chart-title">👥 Team Contribution Distribution</h3>
+                    <canvas id="teamChart"></canvas>
+                </div>
+                <div class="chart-container chart-medium">
+                    <h3 class="chart-title">📖 Subject Distribution</h3>
+                    <canvas id="subjectChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Row 3: Workflow and Duration -->
+            <div class="chart-row">
+                <div class="chart-container chart-medium">
+                    <h3 class="chart-title">🔄 Workflow Stage Distribution</h3>
+                    <canvas id="workflowChart"></canvas>
+                </div>
+                <div class="chart-container chart-medium">
+                    <h3 class="chart-title">⏰ Average Duration by Subject</h3>
+                    <canvas id="durationChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Row 4: Monthly Productivity -->
+            <div class="chart-row">
+                <div class="chart-container chart-large">
+                    <h3 class="chart-title">📈 Monthly Productivity Trend</h3>
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Row 5: Heatmap and On-Time -->
+            <div class="chart-row">
+                <div class="chart-container chart-medium">
+                    <h3 class="chart-title">🔥 Weekly Activity Heatmap</h3>
+                    <div id="heatmapContainer"></div>
+                </div>
+                <div class="chart-container chart-medium">
+                    <h3 class="chart-title">📊 Tasks per Class by Subject</h3>
+                    <canvas id="tasksPerClassChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Row 6: Year Comparison -->
+            <div class="chart-row">
+                <div class="chart-container chart-large">
+                    <h3 class="chart-title">📊 Year-over-Year Comparison</h3>
+                    <canvas id="yearComparisonChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <p>📊 Data Period: June 2021 - May 2023 | Total Tasks: <span id="footer-tasks">625</span> | Dashboard Generated: October 2025</p>
+        </footer>
+    </div>
+
+    <!-- Load Scripts -->
+    <script src="dashboard.js"></script>
+</body>
+</html>
